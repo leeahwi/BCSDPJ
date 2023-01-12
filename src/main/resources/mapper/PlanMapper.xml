@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="org.example.repository.PlanMapper">
+
+    <select id="getPlanById" parameterType="Integer" resultType="org.example.domain.plan.Plan">
+        SELECT
+            pid, title, start_time, end_time, replan_time, team_pfid, user_pfid, memo
+        FROM plan
+        WHERE pid = #{pid}
+    </select>
+
+    <select id="getAlarmPlanUserEmailById" parameterType="Integer" resultType="org.example.domain.plan.PlanAlarmVo">
+        SELECT
+            email
+        FROM user
+        WHERE uid IN
+              (SELECT user_utid FROM user_in_team
+               WHERE
+                   team_utid = (SELECT team_pfid FROM plan WHERE pid = 1));
+    </select>
+
+
+    <insert id="create" parameterType="org.example.domain.plan.Plan">
+        INSERT INTO plan
+            (title, start_time, end_time, replan_time, team_pfid, user_pfid, memo)
+        VALUES (#{title}, #{start_time}, #{end_time}, #{replan_time}, #{team_pfid},#{user_pfid},#{memo});
+    </insert>
+
+    <delete id="delete" parameterType="org.example.domain.plan.Plan">
+        DELETE
+        FROM plan
+        WHERE pid = #{pid}
+    </delete>
+
+    <update id="updateMemo" parameterType="org.example.domain.plan.Plan">
+        UPDATE plan
+        SET memo = #{memo}
+        WHERE pid = #{pid}
+    </update>
+
+    <update id="updateTime" parameterType="org.example.domain.plan.Plan">
+        UPDATE plan
+        SET start_time = #{start_time},
+            end_time = #{end_time}
+        WHERE pid = #{pid}
+    </update>
+</mapper>
